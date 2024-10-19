@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
-import secret
+import splitwise.secret as secret
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,7 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = secret.DJANGO_SECRET_KEY
+SECRET_KEY = secret.SECRET.DJANGO_SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "expenses",
 ]
 
 MIDDLEWARE = [
@@ -76,12 +77,12 @@ WSGI_APPLICATION = "splitwise.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": secret.DB_ENGINE,
-        "NAME": secret.DB_NAME,
-        "USER": secret.DB_USER,
-        "PASSWORD": secret.DB_PASSWORD,
-        "HOST": secret.DB_HOST,
-        "PORT": secret.DB_PORT,
+        "ENGINE": secret.SECRET.DB_ENGINE,
+        "NAME": secret.SECRET.DB_NAME,
+        "USER": secret.SECRET.DB_USER,
+        "PASSWORD": secret.SECRET.DB_PASSWORD,
+        "HOST": secret.SECRET.DB_HOST,
+        "PORT": secret.SECRET.DB_PORT,
     }
 }
 

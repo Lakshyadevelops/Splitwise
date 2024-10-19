@@ -7,7 +7,7 @@ class User(models.Model):
     userId = models.AutoField(primary_key=True)
     name = models.CharField(max_length=255)
     email = models.EmailField(max_length=255, unique=True)
-    phone = models.CharField(max_length=10, min_length=10)
+    phone = models.CharField(max_length=10)
     createdAt = models.DateTimeField(auto_now_add=True)
 
 
