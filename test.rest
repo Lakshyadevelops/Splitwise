@@ -1,0 +1,140 @@
+###
+POST http://127.0.0.1:8000/api/v1/user/login/
+Content-Type: application/json
+{
+  "email":"test@gmail.com",  
+  "password": "test"
+}
+
+###
+POST http://127.0.0.1:8000/api/v1/user/register
+Content-Type: application/json
+{
+  "name": "test",
+  "password": "test",
+  "email": "test10@gmail.com",
+  "phone" : "1234567890"
+}
+
+### 
+GET http://127.0.0.1:8000/api/v1/user/1
+Content-Type: application/json
+{
+
+}
+
+### EXACT EXPENSE GOOD CASE
+POST http://127.0.0.1:8000/api/v1/expense/
+Content-Type: application/json
+Authorization: Token 721900ea7a86c6dee91b21d6241d8d4d4666975d
+
+{
+  "expenseType": "EXACT",
+  "desc": "paytm",
+  "amount": 600,
+  "paidBy": {
+      "1": 300,
+      "2": 300
+  },
+  "owedBy": {
+      "1": 100,
+      "3": 200,
+      "4": 300
+  }
+}
+
+### EXACT EXPENSE TOTAL NOT EQUAL TO AMOUNT
+POST http://127.0.0.1:8000/api/v1/expense/
+Content-Type: application/json
+Authorization: Token 721900ea7a86c6dee91b21d6241d8d4d4666975d
+
+{
+  "expenseType": "EXACT",
+  "desc": "paytm",
+  "amount": 600,
+  "paidBy": {
+      "1": 300,
+      "2": 300
+  },
+  "owedBy": {
+      "1": 100,
+      "3": 300,
+      "4": 300
+  }
+}
+
+### PERCENT EXPENSE HAPPY CASE
+POST http://127.0.0.1:8000/api/v1/expense/
+Content-Type: application/json
+Authorization: Token 721900ea7a86c6dee91b21d6241d8d4d4666975d
+
+{
+  "expenseType": "PERCENT",
+  "desc": "paytm",
+  "amount": 600,
+  "paidBy": {
+      "1": 300,
+      "2": 300
+  },
+  "owedBy": {
+      "1": 20,
+      "3": 30,
+      "4": 50
+  }
+}
+
+### PERCENT EXPENSE RANDOM ALPHABET
+POST http://127.0.0.1:8000/api/v1/expense/
+Content-Type: application/json
+Authorization: Token 721900ea7a86c6dee91b21d6241d8d4d4666975d
+
+{
+  "expenseType": "PERCENT",
+  "desc": "paytm",
+  "amount": 600,
+  "paidBy": {
+      "1": 300,
+      "2": 300
+  },
+  "owedBy": {
+      "1": 20,
+      "3": 30,
+      "4": 50
+  }
+}
+
+### EQUAL EXPENSE HAPPY CASE
+POST http://127.0.0.1:8000/api/v1/expense/
+Content-Type: application/json
+Authorization: Token 721900ea7a86c6dee91b21d6241d8d4d4666975d
+
+{
+  "expenseType": "EQUAL",
+  "desc": "paytm",
+  "amount": 600,
+  "paidBy": {
+      "1": 300,
+      "2": 300
+  },
+  "owedBy": [1, 3, 4]
+}
+
+### PERCENT EXPENSE RANDOM ALPHABET
+POST http://127.0.0.1:8000/api/v1/expense/
+Content-Type: application/json
+Authorization: Token 721900ea7a86c6dee91b21d6241d8d4d4666975d
+
+{
+  "expenseType": "PERCENT",
+  "desc": "paytm",
+  "amount": 600,
+  "paidBy": {
+      "1": 300,
+      "2": 300
+  },
+  "owedBy": {
+      "1": 20,
+      "3": 30,
+      "4": 50
+  }
+}
