@@ -4,18 +4,24 @@ from rest_framework import serializers
 
 
 class ExpenseUserSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True)
-    createdAt = serializers.DateTimeField(read_only=True)
 
     class Meta:
         model = ExpenseUser
         fields = ["name", "email", "phone", "createdAt", "password"]
+        read_only_fields = ["createdAt"]
+        write_only_fields = ["password"]
 
 
 class ExpenseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Expense
         fields = ["expenseId", "desc", "amount", "createdById", "createdAt"]
+        read_only_fields = ["createdById", "createdAt"]
+
+    def create(self, validated_data):
+        user = self.context["request"].user
+        validated_data["createdById"] = user
+        return super().create(validated_data)
 
 
 class ExpensePaidBySerializer(serializers.ModelSerializer):
