@@ -16,6 +16,7 @@ from expenses.serializers import (
 )
 from django.contrib.auth.hashers import make_password
 from django.shortcuts import get_object_or_404
+from django.db.models import Sum, F, DecimalField, OuterRef, Subquery
 
 
 @api_view(["POST"])
@@ -136,7 +137,7 @@ def expense_add(request):
                 amount=val,
             )
             owed_by.save()
-    else :
+    else:
         return Response(
             {"message": "Invalid expense type"},
             status=status.HTTP_400_BAD_REQUEST,
@@ -145,18 +146,98 @@ def expense_add(request):
     return Response({"message": "Expense added successfully"})
 
 
+def get_expenses_with_net_transaction(user_id):
+    # Subquery to sum paid amounts for each expense
+    paid_subquery = (
+        ExpensePaidBy.objects.filter(expenseId=OuterRef("pk"), userId=user_id)
+        .values("expenseId")
+        .annotate(total_paid=Sum("amount"))
+        .values("total_paid")
+    )
+
+    # Subquery to sum owed amounts for each expense
+    owed_subquery = (
+        ExpenseOwedBy.objects.filter(expenseId=OuterRef("pk"), userId=user_id)
+        .values("expenseId")
+        .annotate(total_owed=Sum("amount"))
+        .values("total_owed")
+    )
+
+    # Annotate total paid, total owed, and calculate net_transaction
+    expenses = (
+        Expense.objects.annotate(
+            total_paid=Subquery(paid_subquery, output_field=DecimalField()),
+            total_owed=Subquery(owed_subquery, output_field=DecimalField()),
+            # Calculate net transaction: total paid - total owed (with default value 0 if None)
+            net_transaction=(F("total_paid") - F("total_owed")),
+        )
+        .order_by("createdAt")
+        .values("expenseId", "desc", "amount", "createdAt", "net_transaction")
+    )
+
+    return list(expenses)
+
+
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
 @api_view(["GET"])
-def balance_sheet_get(request):
-    return Response({"message": "Expenses fetched successfully"})
+def balance_sheet_get(request, user_id):
+    total_paid = (
+        ExpensePaidBy.objects.filter(userId_id=user_id).aggregate(
+            total_paid=Sum("amount")
+        )["total_paid"]
+        or 0
+    )
+    total_owed = (
+        ExpenseOwedBy.objects.filter(userId_id=user_id).aggregate(
+            total_owed=Sum("amount")
+        )["total_owed"]
+        or 0
+    )
+    total_balance = total_paid - total_owed
+
+    transactions = get_expenses_with_net_transaction(user_id)
+
+    return Response(
+        {
+            "message": "Expenses fetched successfully",
+            "user_id": user_id,
+            "total_paid": total_paid,
+            "total_owed": total_owed,
+            "total_balance": total_balance,
+            "data": transactions,
+        }
+    )
 
 
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
 @api_view(["GET"])
 def balance_sheet_get_all(request):
-    return Response({"message": "Expenses fetched successfully"})
+    users = ExpenseUser.objects.all()
+    userData = {}
+    for user in users:
+        total_paid = (
+            ExpensePaidBy.objects.filter(userId_id=user.id).aggregate(
+                total_paid=Sum("amount")
+            )["total_paid"]
+            or 0
+        )
+        total_owed = (
+            ExpenseOwedBy.objects.filter(userId_id=user.id).aggregate(
+                total_owed=Sum("amount")
+            )["total_owed"]
+            or 0
+        )
+        transaction = get_expenses_with_net_transaction(user.id)
+        userData[user.id] = {
+            "user_id": user.id,
+            "total_paid": total_paid,
+            "total_owed": total_owed,
+            "total_balance": total_paid - total_owed,
+            "transactions": transaction,
+        }
+    return Response({"message": "Expenses fetched successfully", "data": userData})
 
 
 @authentication_classes([TokenAuthentication])

@@ -1,6 +1,7 @@
 ###
 POST http://127.0.0.1:8000/api/v1/user/login/
 Content-Type: application/json
+
 {
   "email":"test@gmail.com",  
   "password": "test"
@@ -9,16 +10,18 @@ Content-Type: application/json
 ###
 POST http://127.0.0.1:8000/api/v1/user/register
 Content-Type: application/json
+
 {
   "name": "test",
   "password": "test",
-  "email": "test10@gmail.com",
+  "email": "test9@gmail.com",
   "phone" : "1234567890"
 }
 
 ### 
-GET http://127.0.0.1:8000/api/v1/user/1
+GET http://127.0.0.1:8000/api/v1/user/50
 Content-Type: application/json
+
 {
 
 }
@@ -46,7 +49,7 @@ Authorization: Token 721900ea7a86c6dee91b21d6241d8d4d4666975d
 ### EXACT EXPENSE TOTAL NOT EQUAL TO AMOUNT
 POST http://127.0.0.1:8000/api/v1/expense/
 Content-Type: application/json
-Authorization: Token 721900ea7a86c6dee91b21d6241d8d4d4666975d
+Authorization: Token 3d79b837ed1faf3ba9fe8dadd22a6c1c19ad0d70
 
 {
   "expenseType": "EXACT",
@@ -86,7 +89,7 @@ Authorization: Token 721900ea7a86c6dee91b21d6241d8d4d4666975d
 ### PERCENT EXPENSE RANDOM ALPHABET
 POST http://127.0.0.1:8000/api/v1/expense/
 Content-Type: application/json
-Authorization: Token 721900ea7a86c6dee91b21d6241d8d4d4666975d
+Authorization: Token 3d79b837ed1faf3ba9fe8dadd22a6c1c19ad0d70
 
 {
   "expenseType": "PERCENT",
@@ -106,7 +109,7 @@ Authorization: Token 721900ea7a86c6dee91b21d6241d8d4d4666975d
 ### EQUAL EXPENSE HAPPY CASE
 POST http://127.0.0.1:8000/api/v1/expense/
 Content-Type: application/json
-Authorization: Token 721900ea7a86c6dee91b21d6241d8d4d4666975d
+Authorization: Token 3d79b837ed1faf3ba9fe8dadd22a6c1c19ad0d70
 
 {
   "expenseType": "EQUAL",
@@ -137,4 +140,22 @@ Authorization: Token 721900ea7a86c6dee91b21d6241d8d4d4666975d
       "3": 30,
       "4": 50
   }
+}
+
+### GET BALANCE SHEET USER
+GET http://127.0.0.1:8000/api/v1/balance-sheet/1
+Content-Type: application/json
+Authorization: Token 3d79b837ed1faf3ba9fe8dadd22a6c1c19ad0d70
+
+{
+
+}
+
+### GET BALANCE SHEET ALL
+GET http://127.0.0.1:8000/api/v1/balance-sheet/
+Content-Type: application/json
+Authorization: Token 3d79b837ed1faf3ba9fe8dadd22a6c1c19ad0d70
+
+{
+
 }
