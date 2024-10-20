@@ -1,11 +1,11 @@
-from .models import User, Expense, ExpensePaidBy, ExpenseOwedBy
+from .models import ExpenseUser, Expense, ExpensePaidBy, ExpenseOwedBy
 
 from rest_framework import serializers
 
-class UserSerializer(serializers.ModelSerializer):
+class ExpenseUserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = User
-        fields = ['userId', "password" , 'name', 'email', 'phone', 'createdAt']
+        model = ExpenseUser
+        fields = [ "password" , 'name', 'email', 'phone', 'createdAt']
 
 class ExpenseSerializer(serializers.ModelSerializer):
     class Meta:
