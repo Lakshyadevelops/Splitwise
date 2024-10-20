@@ -21,8 +21,8 @@ from expenses import views
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("api/v1/user/register", views.register_user),
-    path("api/v1/user/login/", views.get_user),
-    path("api/v1/user/<int:user_id>/", views.get_user),
-    path("api/v1/expense/", views.add_expense),
+    path("api/v1/user/register", views.user_register),
+    path("api/v1/user/login/", views.user_login),
+    path("api/v1/user/<int:user_id>/", views.user_get),
+    path("api/v1/expense/", views.expense_add),
 ]

@@ -1,25 +1,24 @@
 from django.shortcuts import render
 from rest_framework.decorators import api_view
+from rest_framework.response import Response
 from expenses import models
-
-# Create your views here.
 
 
 @api_view(["POST"])
-def register_user(request):
-    pass
+def user_register(request):
+    return Response({"message": "User registered successfully"})
 
 
 @api_view(["GET"])
-def get_user(request):
-    pass
+def user_get(request):
+    return Response({"message": "User retrieved successfully"})
 
 
 @api_view(["POST"])
-def add_expense(request):
-    pass
+def expense_add(request):
+    return Response({"message": "Expense added successfully"})
 
 
 @api_view(["POST"])
 def user_login(request):
-    pass
+    return Response({"message": "User logged in successfully"})
