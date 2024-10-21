@@ -95,7 +95,7 @@
             <div class="user-details">
                 <p><strong>Total Paid:</strong> Rs {{ user.total_paid }}</p>
                 <p><strong>Total Owed:</strong> Rs {{ user.total_owed }}</p>
-                <p><strong>Balance:</strong> Rs {{ user.total_balance }}</p>
+                <p><strong>Net Balance:</strong> Rs {{ user.total_balance }}</p>
             </div>
 
             <h3>Transaction Details</h3>
@@ -105,6 +105,8 @@
                         <th>Expense ID</th>
                         <th>Description</th>
                         <th>Amount</th>
+                        <th>Paid</th>
+                        <th>Owed</th>
                         <th>Net Transaction</th>
                         <th>Created At</th>
                     </tr>
@@ -115,6 +117,8 @@
                             <td>{{ transaction.expenseId }}</td>
                             <td>{{ transaction.desc }}</td>
                             <td>Rs {{ transaction.amount }}</td>
+                            <td>Rs {{ transaction.total_paid }}</td> <!-- Added field for Paid -->
+                            <td>Rs {{ transaction.total_owed }}</td> <!-- Added field for Owed -->
                             <td>Rs {{ transaction.net_transaction }}</td>
                             <td>{{ transaction.createdAt }}</td>
                         </tr>

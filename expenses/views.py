@@ -16,7 +16,8 @@ from expenses.serializers import (
 )
 from django.contrib.auth.hashers import make_password
 from django.shortcuts import get_object_or_404
-from django.db.models import Sum, F, DecimalField, OuterRef, Subquery
+from django.db.models import Sum, F, DecimalField, OuterRef, Subquery, Value
+from django.db.models.functions import Coalesce
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from xhtml2pdf import pisa
@@ -166,16 +167,34 @@ def get_expenses_with_net_transaction(user_id):
         .values("total_owed")
     )
 
-    # Annotate total paid, total owed, and calculate net_transaction
-    expenses = (
-        Expense.objects.annotate(
-            total_paid=Subquery(paid_subquery, output_field=DecimalField()),
-            total_owed=Subquery(owed_subquery, output_field=DecimalField()),
-            # Calculate net transaction: total paid - total owed (with default value 0 if None)
-            net_transaction=(F("total_paid") - F("total_owed")),
-        )
-        .order_by("createdAt")
-        .values("expenseId", "desc", "amount", "createdAt", "net_transaction")
+    # Step 1: Annotate total paid, total owed, and calculate net_transaction
+    annotated_expenses = Expense.objects.annotate(
+        total_paid=Coalesce(
+            Subquery(paid_subquery, output_field=DecimalField()),
+            Value(0, output_field=DecimalField()),
+        ),
+        total_owed=Coalesce(
+            Subquery(owed_subquery, output_field=DecimalField()),
+            Value(0, output_field=DecimalField()),
+        ),
+        # Calculate net transaction: total paid - total owed
+        net_transaction=F("total_paid") - F("total_owed"),
+    )
+
+    # Step 2: Filter only those expenses where the user is involved (paid or owed)
+    involved_expenses = annotated_expenses.filter(
+        total_paid__gt=0
+    ) | annotated_expenses.filter(total_owed__gt=0)
+
+    # Step 3: Order by createdAt and return relevant fields
+    expenses = involved_expenses.order_by("createdAt").values(
+        "expenseId",
+        "desc",
+        "amount",
+        "createdAt",
+        "total_paid",
+        "total_owed",
+        "net_transaction",
     )
 
     return list(expenses)
