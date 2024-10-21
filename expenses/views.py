@@ -17,6 +17,9 @@ from expenses.serializers import (
 from django.contrib.auth.hashers import make_password
 from django.shortcuts import get_object_or_404
 from django.db.models import Sum, F, DecimalField, OuterRef, Subquery
+from django.http import HttpResponse
+from django.template.loader import render_to_string
+from xhtml2pdf import pisa
 
 
 @api_view(["POST"])
@@ -240,8 +243,51 @@ def balance_sheet_get_all(request):
     return Response({"message": "Expenses fetched successfully", "data": userData})
 
 
+def render_to_pdf(template_src, context_dict={}):
+    template = render_to_string(template_src, context_dict)
+    response = HttpResponse(content_type="application/pdf")
+    response["Content-Disposition"] = 'attachment; filename="balance_sheet.pdf"'
+
+    pisa_status = pisa.CreatePDF(template, dest=response)
+
+    if pisa_status.err:
+        return HttpResponse(f"We had some errors with code {pisa_status.err}")
+
+    return response
+
+
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
 @api_view(["GET"])
 def balance_sheet_get_all_pdf(request):
-    return Response({"message": "Expenses pdf fetched successfully"})
+    users = ExpenseUser.objects.all()
+    userData = []
+    for user in users:
+        total_paid = (
+            ExpensePaidBy.objects.filter(userId_id=user.id).aggregate(
+                total_paid=Sum("amount")
+            )["total_paid"]
+            or 0
+        )
+        total_owed = (
+            ExpenseOwedBy.objects.filter(userId_id=user.id).aggregate(
+                total_owed=Sum("amount")
+            )["total_owed"]
+            or 0
+        )
+        transaction = get_expenses_with_net_transaction(user.id)
+        userData.append(
+            {
+                "user_id": user.id,
+                "name": user.name,
+                "email": user.email,
+                "total_paid": total_paid,
+                "total_owed": total_owed,
+                "total_balance": total_paid - total_owed,
+                "transactions": transaction,
+            }
+        )
+
+    context = {"data": userData}
+
+    return render_to_pdf("balance_sheet_template.html", context)
