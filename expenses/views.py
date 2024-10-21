@@ -16,7 +16,7 @@ from expenses.serializers import (
 )
 from django.contrib.auth.hashers import make_password
 from django.shortcuts import get_object_or_404
-from django.db.models import Sum, F, DecimalField, OuterRef, Subquery, Value
+from django.db.models import Sum, F, DecimalField, OuterRef, Subquery, Value, Q
 from django.db.models.functions import Coalesce
 from django.http import HttpResponse
 from django.template.loader import render_to_string
@@ -151,7 +151,7 @@ def expense_add(request):
 
 
 def get_expenses_with_net_transaction(user_id):
-    # Subquery to sum paid amounts for each expense
+    # Subquery to sum paid amounts for each expense, filtering by user
     paid_subquery = (
         ExpensePaidBy.objects.filter(expenseId=OuterRef("pk"), userId=user_id)
         .values("expenseId")
@@ -159,7 +159,7 @@ def get_expenses_with_net_transaction(user_id):
         .values("total_paid")
     )
 
-    # Subquery to sum owed amounts for each expense
+    # Subquery to sum owed amounts for each expense, filtering by user
     owed_subquery = (
         ExpenseOwedBy.objects.filter(expenseId=OuterRef("pk"), userId=user_id)
         .values("expenseId")
@@ -167,27 +167,30 @@ def get_expenses_with_net_transaction(user_id):
         .values("total_owed")
     )
 
-    # Step 1: Annotate total paid, total owed, and calculate net_transaction
-    annotated_expenses = Expense.objects.annotate(
-        total_paid=Coalesce(
-            Subquery(paid_subquery, output_field=DecimalField()),
-            Value(0, output_field=DecimalField()),
-        ),
-        total_owed=Coalesce(
-            Subquery(owed_subquery, output_field=DecimalField()),
-            Value(0, output_field=DecimalField()),
-        ),
-        # Calculate net transaction: total paid - total owed
-        net_transaction=F("total_paid") - F("total_owed"),
+    # Step 1: Annotate total paid, total owed
+    annotated_expenses = (
+        Expense.objects.annotate(
+            total_paid=Coalesce(
+                Subquery(paid_subquery, output_field=DecimalField()),
+                Value(0, output_field=DecimalField()),
+            ),
+            total_owed=Coalesce(
+                Subquery(owed_subquery, output_field=DecimalField()),
+                Value(0, output_field=DecimalField()),
+            ),
+        )
+        .filter(
+            Q(total_paid__gt=0) | Q(total_owed__gt=0)  # Use Q objects for filtering
+        )
+        .annotate(
+            # Calculate net transaction: total paid - total owed
+            net_transaction=F("total_paid")
+            - F("total_owed"),
+        )
     )
 
-    # Step 2: Filter only those expenses where the user is involved (paid or owed)
-    involved_expenses = annotated_expenses.filter(
-        total_paid__gt=0
-    ) | annotated_expenses.filter(total_owed__gt=0)
-
-    # Step 3: Order by createdAt and return relevant fields
-    expenses = involved_expenses.order_by("createdAt").values(
+    # Step 2: Order by createdAt and return relevant fields
+    expenses = annotated_expenses.order_by("createdAt").values(
         "expenseId",
         "desc",
         "amount",
