@@ -38,3 +38,9 @@ python manage.py runserver
  - [Balance Sheet Get](/test.rest?plain=1#L125)
  - [Balance Sheet Get All](/test.rest?plain=1#L134)
  - [Balance Sheet Get All Pdf](/test.rest?plain=1#L143)
+
+
+## Upcoming Features
+
+ - Per Expense owed and payed in balance sheet
+ - Final balances owed and payed between users
