@@ -1,13 +1,4 @@
-###
-POST http://127.0.0.1:8000/api/v1/user/login/
-Content-Type: application/json
-
-{
-  "email":"test@gmail.com",  
-  "password": "test"
-}
-
-###
+### User Register
 POST http://127.0.0.1:8000/api/v1/user/register
 Content-Type: application/json
 
@@ -18,7 +9,16 @@ Content-Type: application/json
   "phone" : "1234567890"
 }
 
-### 
+### User Login
+POST http://127.0.0.1:8000/api/v1/user/login/
+Content-Type: application/json
+
+{
+  "email":"test@gmail.com",  
+  "password": "test"
+}
+
+### User Get
 GET http://127.0.0.1:8000/api/v1/user/50
 Content-Type: application/json
 
@@ -86,7 +86,7 @@ Authorization: Token 721900ea7a86c6dee91b21d6241d8d4d4666975d
   }
 }
 
-### PERCENT EXPENSE RANDOM ALPHABET
+### PERCENT EXPENSE PERCENT NOT EQUAL TO 100
 POST http://127.0.0.1:8000/api/v1/expense/
 Content-Type: application/json
 Authorization: Token 3d79b837ed1faf3ba9fe8dadd22a6c1c19ad0d70
@@ -101,7 +101,7 @@ Authorization: Token 3d79b837ed1faf3ba9fe8dadd22a6c1c19ad0d70
   },
   "owedBy": {
       "1": 20,
-      "3": 30,
+      "3": 40,
       "4": 50
   }
 }
@@ -120,26 +120,6 @@ Authorization: Token 3d79b837ed1faf3ba9fe8dadd22a6c1c19ad0d70
       "2": 300
   },
   "owedBy": [1, 3, 4]
-}
-
-### PERCENT EXPENSE RANDOM ALPHABET
-POST http://127.0.0.1:8000/api/v1/expense/
-Content-Type: application/json
-Authorization: Token 721900ea7a86c6dee91b21d6241d8d4d4666975d
-
-{
-  "expenseType": "PERCENT",
-  "desc": "paytm",
-  "amount": 600,
-  "paidBy": {
-      "1": 300,
-      "2": 300
-  },
-  "owedBy": {
-      "1": 20,
-      "3": 30,
-      "4": 50
-  }
 }
 
 ### GET BALANCE SHEET USER

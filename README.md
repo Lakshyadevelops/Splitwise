@@ -19,3 +19,22 @@ python manage.py makemigrations
 python manage.py migrate
 python manage.py runserver
 ```
+
+## API Reference
+[Install](https://marketplace.visualstudio.com/items?itemName=humao.rest-client) to directly test APIs from VS Code
+
+
+### User
+ - [User Register](/test.rest?plain=1#L1)
+ - [User Login](/test.rest?plain=1#L12)
+ - [User Get](/test.rest?plain=1#L21)
+
+### Expense
+ - [Add Exact](/test.rest?plain=1#L29)
+ - [Add Percent](/test.rest?plain=1#L69)
+ - [Add Equal](/test.rest?plain=1#L109)
+
+### Balance Sheet
+ - [Balance Sheet Get](/test.rest?plain=1#L125)
+ - [Balance Sheet Get All](/test.rest?plain=1#L134)
+ - [Balance Sheet Get All Pdf](/test.rest?plain=1#L143)
