@@ -1,5 +1,9 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser,PermissionsMixin, BaseUserManager
+from django.contrib.auth.models import (
+    AbstractBaseUser,
+    PermissionsMixin,
+    BaseUserManager,
+)
 from django.core.validators import EmailValidator
 from .validators import validate_phone_number
 
@@ -7,7 +11,7 @@ from .validators import validate_phone_number
 class ExpenseUserManager(BaseUserManager):
     def create_user(self, email, password, **extra_fields):
         if not email:
-            raise ValueError('The Email field must be set')
+            raise ValueError("The Email field must be set")
         email = self.normalize_email(email)
         user = self.model(email=email, **extra_fields)
         user.set_password(password)  # Hashes the password
@@ -15,14 +19,19 @@ class ExpenseUserManager(BaseUserManager):
         return user
 
     def create_superuser(self, email, password, **extra_fields):
-        extra_fields.setdefault('is_staff', True)
-        extra_fields.setdefault('is_superuser', True)
+        extra_fields.setdefault("is_staff", True)
+        extra_fields.setdefault("is_superuser", True)
         return self.create_user(email, password, **extra_fields)
 
+
 class ExpenseUser(AbstractBaseUser, PermissionsMixin):
-    email = models.EmailField(max_length=255, unique=True, blank=False ,validators=[EmailValidator])
+    email = models.EmailField(
+        max_length=255, unique=True, blank=False, validators=[EmailValidator]
+    )
     name = models.CharField(max_length=255, blank=False)
-    phone = models.CharField(max_length=10, blank=False , validators=[validate_phone_number])
+    phone = models.CharField(
+        max_length=10, blank=False, validators=[validate_phone_number]
+    )
     createdAt = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
@@ -50,6 +59,9 @@ class ExpensePaidBy(models.Model):
 
     class Meta:
         unique_together = (("expenseId", "userId"),)
+        indexes = [
+            models.Index(fields=["userId"]),
+        ]
 
 
 class ExpenseOwedBy(models.Model):
@@ -59,3 +71,6 @@ class ExpenseOwedBy(models.Model):
 
     class Meta:
         unique_together = (("expenseId", "userId"),)
+        indexes = [
+            models.Index(fields=["userId"]),
+        ]
