@@ -9,7 +9,9 @@ class ExpenseUserSerializer(serializers.ModelSerializer):
         model = ExpenseUser
         fields = ["name", "email", "phone", "createdAt", "password"]
         read_only_fields = ["createdAt"]
-        write_only_fields = ["password"]
+        extra_kwargs = {
+            'password': {'write_only': True}  # Ensure password is write-only
+        }
 
 
 class ExpenseSerializer(serializers.ModelSerializer):
